@@ -1,0 +1,7 @@
+
+jwt:
+  sign-key: ${JWT_SECRET:0U+3NCWDTlLJyZJWWCYDrrw2wseSwSnhGC/d+jLSHBwgSWfc5iLk5D53EflT5ADYjfha7tDnL7lA3yvRX6z7ng==}
+  access-token:
+    expiration: 3600000 # 1 hour
+  refresh-token:
+    expiration: 604800000 # 7 days
