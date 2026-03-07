@@ -18,19 +18,21 @@ import java.util.UUID;
 @Builder
 public class Users {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "UUID DEFAULT uuid_generate_v4()")
     private UUID userId;
-    @Column(name="name",nullable=false,length=100)
+    @Column(name="username",nullable=false,length=100)
     private String username;
-    @Column(name="password_hash",nullable=false,length=200)
+    @Column(name="password",nullable=false,length=200)
     private String password;
     @Column(name="email",nullable=false,length=200)
     private String email;
     @Column(name="is_active",nullable=false,length=200)
     private Boolean is_active=true;
-    @Column(name="phone",nullable = false,length = 20)
+    @Column(name="phone",nullable = true,length = 20)
     private String phone;
+    @Column(name="gender")
+    private Boolean gender;
     @CreationTimestamp
     @Column(name="created_at")
     private LocalDateTime create_at;
@@ -38,6 +40,6 @@ public class Users {
     @Column(name="updated_at")
     private LocalDateTime update_at;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="role_id")
+    @JoinColumn(name="role_code")
     private Roles roles ;
 }

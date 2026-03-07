@@ -9,9 +9,8 @@ import org.example.be_dimuadi.Persitence.Entity.Roles;
 @NoArgsConstructor
 @Data
 public class RolesDto {
-
+    @NotBlank
+    private Long roleCode;
     @NotBlank
     private String roleName;
-    @NotBlank
-    private String roleCode;
 }

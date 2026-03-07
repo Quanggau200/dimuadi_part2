@@ -17,7 +17,5 @@ import java.util.UUID;
 public class AuthenticationResponse {
     @NotBlank(message = "access token is required")
     private String access_token;
-    @NotBlank(message = "refresh token is required")
-    private String refresh_token;
     private Boolean authenticated;
 }

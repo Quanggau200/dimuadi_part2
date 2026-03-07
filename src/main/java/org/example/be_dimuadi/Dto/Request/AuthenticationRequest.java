@@ -18,7 +18,5 @@ public class AuthenticationRequest {
     private String email;
     @NotBlank(message = "password is not required")
     private String password;
-    @NotBlank(message = "Phone is not required")
-    private String phone;
 
 }

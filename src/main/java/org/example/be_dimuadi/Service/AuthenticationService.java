@@ -30,32 +30,27 @@ public class AuthenticationService {
     public AuthenticationResponse createUser(AuthenticationRequest request) {
         log.info("In method register user");
         if (userReponsitory.existsByEmail(request.getEmail())) {
-            throw new UsernameNotFoundException("User with email " + request.getEmail() + " already exists");
-        }
-        if (userReponsitory.existsByPhone((request.getPhone()))) {
-            throw new UsernameNotFoundException("User with Phone " + request.getPhone() + " already exists");
+            throw new IllegalArgumentException("User with email " + request.getEmail() + " already exists");
         }
         Users newUser=buildUserRequest(request);
         String accessToken=jwtServices.GenerateAccessToken(newUser);
-        String refreshToken=jwtServices.GenerateRefreshToken(newUser);
         Users saveUser=userReponsitory.save(newUser);
 
         log.debug("Tokens generated successfully for user: {}", saveUser.getUsername());
         return AuthenticationResponse.builder()
                 .access_token(accessToken)
-                .refresh_token(refreshToken).build();
+                .authenticated(true)
+                .build();
     }
     public AuthenticationResponse login(AuthenticationRequest request) {
-        var userLogin=userReponsitory.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User with email " + request.getEmail() + " not found"));
+        var userLogin=userReponsitory.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("User with email " + request.getEmail() + " not found"));
         boolean passwordHash=passwordEncoder.matches(request.getPassword(),userLogin.getPassword());
         if(!passwordHash) {
             throw new UsernameNotFoundException("Invalid username or password");
         }
         String accessToken=jwtServices.GenerateAccessToken(userLogin);
-        String refreshToken=jwtServices.GenerateRefreshToken(userLogin);
         return AuthenticationResponse.builder()
                 .access_token(accessToken)
-                .refresh_token(refreshToken)
                 .authenticated(true)
                 .build();
     }
@@ -67,7 +62,6 @@ public class AuthenticationService {
         users.setPassword(passwordEncoder.encode(request.getPassword()));
         users.setEmail(request.getEmail());
         users.setRoles(userRole);
-        users.setPhone(request.getPhone());
         users.setCreate_at(LocalDateTime.now());
         users.setIs_active(true);
         return users;

@@ -9,6 +9,7 @@ import org.apache.logging.log4j.core.config.plugins.validation.constraints.Requi
 import org.example.be_dimuadi.Persitence.Entity.Roles;
 
 import javax.management.relation.Role;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -17,16 +18,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UsersDto {
-    private UUID user_id;
-    @NotBlank
-    @Required(message = "Username is required")
     private String username;
-    @NotBlank
-    @Required(message = "Password is required")
-    private String password;
-    @NotBlank
-    @Required(message = "Email must be valid format")
     private String email;
+    private String phone;
+    private String roles;
 
-    private Roles role;
 }

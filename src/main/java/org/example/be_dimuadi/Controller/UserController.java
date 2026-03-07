@@ -5,10 +5,13 @@ import org.example.be_dimuadi.Dto.Request.AuthenticationRequest;
 import org.example.be_dimuadi.Dto.Response.ApiResponse;
 import org.example.be_dimuadi.Dto.Response.AuthenticationResponse;
 import jakarta.validation.Valid;
+import org.example.be_dimuadi.Dto.UsersDto;
 import org.example.be_dimuadi.Service.AuthenticationService;
+import org.example.be_dimuadi.Service.UserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
     private final AuthenticationService authenticationService;
+    private final UserService userService;
     @PostMapping("/create-new-user")
     public ResponseEntity<ApiResponse<AuthenticationResponse>> createNewUser(@Valid @RequestBody AuthenticationRequest authenticationRequest){
         AuthenticationResponse userResponse=authenticationService.createUser(authenticationRequest);
@@ -26,10 +30,24 @@ public class UserController {
         AuthenticationResponse userResponseLogin=authenticationService.login(authenticationRequest);
         return buildAuthResponse(userResponseLogin,"LOGIN SUCCESSFULLY");
     }
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse<UsersDto>> getMe() {
+        String username = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+        UsersDto resProfile=userService.getUserInfo(username);
+        ApiResponse<UsersDto> apiResponse=new ApiResponse<>(
+                200,
+                "GET PROFILE SUCCESSFULLY",
+                "SUCCESS",
+                resProfile
+        );
+        return ResponseEntity.ok(apiResponse);
+    }
     private ResponseEntity<ApiResponse<AuthenticationResponse>> buildAuthResponse(@Valid @RequestBody AuthenticationResponse authenticationResponse,String messages){
-        ResponseCookie cookie=ResponseCookie.from("refresh_token",authenticationResponse.getRefresh_token())
+        ResponseCookie cookie=ResponseCookie.from("refresh_token",authenticationResponse.getAccess_token())
                 .path("/")
-                .secure(false)
+                .secure(true)
                 .maxAge(30 * 24 * 60 * 60)
                 .httpOnly(true)
                 .sameSite("None")
@@ -41,8 +59,7 @@ public class UserController {
                 authenticationResponse
         );
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .header(HttpHeaders.AUTHORIZATION,"Bearer" +authenticationResponse.getAccess_token())
+                .header(HttpHeaders.SET_COOKIE, cookie.toString()).header(HttpHeaders.AUTHORIZATION,"Bearer" +authenticationResponse.getAccess_token())
                 .body(apiResponse);
     }
    }

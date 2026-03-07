@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Component
@@ -28,22 +29,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws IOException, ServletException {
-        String token=req.getHeader("Authorization");
-        if(token==null || !token.startsWith("Bearer "))
+        String authHeader=req.getHeader("Authorization");
+        log.info("Auth header: {}", authHeader);
+        if(authHeader==null || !authHeader.startsWith("Bearer"))
         {
             chain.doFilter(req, res);
             return;
         }
-        if("OPTIONS".equals(req.getMethod())){
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            res.setStatus(HttpServletResponse.SC_OK);
-            chain.doFilter(req, res); // cho đi tiếp
-            return;
-        }
         try {
+            String token=authHeader.substring(7);
             String username=jwtServices.extractUsername(token);
+            log.info("Username extracted: {}", username);
             if(username==null){
                 chain.doFilter(req, res);
+                return ;
             }
                 UserDetails userDetails=userService.loadUserByUsername(username);
                 if(jwtServices.ValidateToken(token,userDetails)){
@@ -56,6 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
         }
         catch(Exception e){
+            log.info("here");
+            SecurityContextHolder.clearContext();
+            chain.doFilter(req,res);
             throw new RuntimeException(e);
         }
         chain.doFilter(req, res);
