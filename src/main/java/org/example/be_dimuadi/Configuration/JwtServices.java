@@ -42,24 +42,14 @@ public class JwtServices {
         }
         return secretKey;
     }
-    // gen refresh token
-    public String GenerateRefreshToken(Users user)
-    {
-        Map<String,Object> claims=new HashMap<>();
-        claims.put("user_id",user.getUserId());
-        claims.put("phone",user.getPhone());
-        claims.put("email",user.getEmail());
-        claims.put("sub",user.getUsername());
-        return CreateToken(claims,user.getUsername(),RefreshTokenExpiration);
-    }
     // gen access token
     public String GenerateAccessToken(Users user)
     {
         Map<String,Object> claims=new HashMap<>();
-        claims.put("user_id",user.getUserId());
-        claims.put("phone",user.getPhone());
+        claims.put("user_id",user.getUserId().toString());
+        claims.put("email",user.getEmail());
         claims.put("sub",user.getUsername());
-        return CreateToken(claims,user.getUsername(),AccessTokenExpiration);
+        return CreateToken(claims,user.getUserId().toString(),AccessTokenExpiration);
     }
     //gen token core
     public String CreateToken(Map<String,Object> claims,String subject,long expiration )
@@ -86,7 +76,7 @@ public class JwtServices {
     public String extractUsername(String token)
     {
         try{
-            return extractClaim(token,Claims::getSubject);
+            return extractClaim(token, Claims::getSubject);
         }
         catch (Exception e)
         {
@@ -94,7 +84,6 @@ public class JwtServices {
             return null;
         }
     }
-
     public <T> T extractClaim(String token, Function<Claims,T> clazz)
     {
         final Claims claims=extractAllClaims(token);
@@ -108,7 +97,8 @@ public class JwtServices {
                     .verifyWith(getSignKey())
                     .build()
                     .parseSignedClaims(token)
-                    .getPayload();
+                    .getPayload()
+                    ;
         }
         catch (Exception e)
         {
@@ -116,25 +106,12 @@ public class JwtServices {
             return null;
         }
     }
-    public boolean ValidateToken(String token, UserDetails user)
-    {
-       try{
-            final String username=extractUsername(token);
-            boolean isValid=username!=null && username.equals(user.getUsername()) && !isTokenExpired(token);
-            if(isValid)
-            {
-                log.debug("Username {} has been validated",username);
-            }
-            else
-            {
-                log.warn("Token validation failed for user: {}", username);
-            }
-            return isValid;
-       }
-       catch (Exception e)
-       {
-           throw new RuntimeException(e);
-       }
+    public boolean ValidateToken(String token, UserDetails userDetails) {
+        final String userId = extractUsername(token); // → ID
+
+        // Load user từ repo để lấy ID so sánh
+        return userId != null
+                && !isTokenExpired(token); // ✅ không cần cast
     }
     // kiểm tra xem token hết hạn hay chưa
     public boolean isTokenExpired(String token)

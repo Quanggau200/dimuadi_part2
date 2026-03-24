@@ -1,0 +1,38 @@
+package org.example.be_dimuadi.Exception;
+
+import lombok.Getter;
+
+@Getter
+public enum ErrorCode {
+
+    // SUCCESS
+    SUCCESS,
+    UPDATE_USER,
+
+    // VALIDATION
+    VALIDATION_ERROR,
+    INVALID_EMAIL_FORMAT,
+    PASSWORD_TOO_SHORT,
+    INVALID_PASSWORD,
+    EMAIL_NOT_FOUND,
+    TOKEN_IS_INVALID,
+    INVALID_DATA,
+    UNAUTHORIZED,
+    NOT_FOUND,
+    BAD_REQUEST,
+    ADDRESS_EXIST,
+
+    // AUTH
+    INVALID_CREDENTIALS,
+    TOKEN_EXPIRED,
+    TOKEN_INVALID,
+
+    // USER
+    USER_NOT_FOUND,
+    EMAIL_ALREADY_EXISTS,
+    USERNAME_ALREADY_EXISTS,
+    ACCOUNT_DISABLED,
+    ROLE_CODE_NOT_FOUND,
+    // SERVER
+    INTERNAL_SERVER_ERROR
+}

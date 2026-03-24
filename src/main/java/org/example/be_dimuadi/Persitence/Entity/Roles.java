@@ -11,18 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
-@Setter
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
 @Table(name="roles")
+@Getter
+@Setter
 public class Roles {
 
-  @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roleCode;
-  @Column (name="role_name",nullable = false,length = 100)
+    @Column (name="role_name",nullable = false,length = 100)
     private String roleName;
 }
